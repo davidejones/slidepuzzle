@@ -52,7 +52,7 @@ def main():
     pygame.init()
     #display = pygame.display.set_mode((image_obj.width, image_obj.height))
     display = pygame.display.set_mode((960, 641))
-    display.fill(0xFFFFFF)
+    display.fill(pygame.Color(255, 255, 255))
     pygame.display.set_caption('Slide Puzzle')
 
     all_sprites_list = pygame.sprite.Group()
