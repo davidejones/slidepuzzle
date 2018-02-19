@@ -18,30 +18,34 @@ class Tile(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
         self.over = False
+        self.hidden = False
 
-    def hidden(self):
-        self.image.fill((255, 255, 255))
+    def hide(self):
+        self.hidden = True
+        self.image.fill((0, 0, 0))
 
     def click(self, mouse):
-        if self.rect.collidepoint(mouse):
-            print("hit RED")
-            self.image.fill(pygame.Color(0, 0, 0, 0))
-            self.image.set_alpha(128)
-            #self.image.set_alpha(128)
-            #self.image.fill((255, 255, 255, 1), None, pygame.BLEND_RGBA_MULT)
-            #self.image.fill(pygame.Color(40, 50, 50, 128), None, pygame.BLEND_RGBA_MULT)
+        if not self.hidden:
+            if self.rect.collidepoint(mouse):
+                self.image.fill(pygame.Color(0, 0, 0, 0))
+                self.image.set_alpha(128)
+                #self.image.set_alpha(128)
+                #self.image.fill((255, 255, 255, 1), None, pygame.BLEND_RGBA_MULT)
+                #self.image.fill(pygame.Color(40, 50, 50, 128), None, pygame.BLEND_RGBA_MULT)
 
     def mouse_out(self):
-        self.over = False
-        self.image = pygame.image.fromstring(self.cropped_image.tobytes(), self.cropped_image.size,
+        if not self.hidden:
+            self.over = False
+            self.image = pygame.image.fromstring(self.cropped_image.tobytes(), self.cropped_image.size,
                                              self.cropped_image.mode)
 
     def mouse_over(self, mouse):
-        if not self.over:
-            if self.rect.collidepoint(mouse):
-                #self.image.fill((255, 0, 0, 128), None, pygame.BLEND_RGBA_MULT)
-                self.image.fill(pygame.Color(40, 50, 50, 128), None, pygame.BLEND_RGBA_MULT)
-                self.over = True
+        if not self.hidden:
+            if not self.over:
+                if self.rect.collidepoint(mouse):
+                    #self.image.fill((255, 0, 0, 128), None, pygame.BLEND_RGBA_MULT)
+                    self.image.fill(pygame.Color(40, 50, 50, 128), None, pygame.BLEND_RGBA_MULT)
+                    self.over = True
 
 
 def main():
@@ -85,7 +89,7 @@ def main():
         sprite.rect.x = pos[0]
         sprite.rect.y = pos[1]
         if i == blank_index:
-            sprite.hidden()
+            sprite.hide()
 
     is_running = True
     clock = pygame.time.Clock()
@@ -104,7 +108,10 @@ def main():
 
         for s in all_sprites_list:
             s.mouse_out()
-            s.mouse_over(pygame.mouse.get_pos())
+            if pygame.mouse.get_focused():
+                s.mouse_over(pygame.mouse.get_pos())
+            else:
+                s.mouse_out()
 
         all_sprites_list.update()
         all_sprites_list.draw(display)
